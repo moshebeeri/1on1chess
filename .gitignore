@@ -1,0 +1,9 @@
+# Playwright MCP test artifacts
+.playwright-mcp/
+
+# IDE
+.qodo/
+.claude/
+
+# OS
+.DS_Store

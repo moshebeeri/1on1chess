@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabletop Chess</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #2c3e50;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2vmin;
+            padding: 2vmin;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 60vmin;
+            height: 60vmin;
+            aspect-ratio: 1;
+            border: 3px solid #34495e;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .square {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 7vmin;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+            position: relative;
+            aspect-ratio: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .coord-file {
+            position: absolute;
+            bottom: 1px;
+            right: 2px;
+            font-size: 2vmin;
+            font-weight: bold;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .coord-rank {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 2vmin;
+            font-weight: bold;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .square.light {
+            background-color: #f0d9b5;
+        }
+        
+        .square.dark {
+            background-color: #b58863;
+        }
+        
+        .square.selected {
+            background-color: #7fc97f !important;
+        }
+        
+        .square.legal-move {
+            position: relative;
+        }
+        
+        .square.legal-move::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+        }
+        
+        .square.legal-move.has-piece::after {
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 4px solid rgba(0, 0, 0, 0.3);
+        }
+        
+        .piece {
+            pointer-events: auto;
+            cursor: grab;
+        }
+
+        .piece:active {
+            cursor: grabbing;
+        }
+
+        .square.drag-over {
+            background-color: rgba(127, 201, 127, 0.5) !important;
+        }
+
+        .piece.white {
+            color: white;
+            text-shadow: 0 0 2px black, 0 0 2px black, 0 0 2px black;
+        }
+
+        .piece.black {
+            display: inline-block;
+            transform: rotate(180deg);
+        }
+
+        .piece.in-check {
+            animation: check-glow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes check-glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8))
+                        drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(255, 0, 0, 1))
+                        drop-shadow(0 0 25px rgba(255, 0, 0, 0.8));
+            }
+        }
+        
+        .timers-group {
+            display: flex;
+            gap: 2vmin;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #timersTop {
+            position: relative;
+            transform: rotate(180deg);
+        }
+
+        #timersBottom {
+            position: relative;
+        }
+
+        .timer {
+            font-size: 3vmin;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 2vmin 3vmin;
+            border-radius: 1vmin;
+            min-width: 15vmin;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .timer.active {
+            background: rgba(76, 175, 80, 0.9);
+            font-size: 3.6vmin;
+            padding: 2.4vmin 3.6vmin;
+            min-width: 18vmin;
+        }
+        
+        #status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 3vmin 6vmin;
+            border-radius: 2vmin;
+            font-size: 4vmin;
+            display: none;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 350px;
+            background: rgba(44, 62, 80, 0.98);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        #sidebarToggle {
+            position: fixed;
+            left: 350px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            border: none;
+            padding: 20px 10px;
+            cursor: pointer;
+            z-index: 101;
+            border-radius: 0 5px 5px 0;
+            font-weight: bold;
+            transition: left 0.3s;
+        }
+
+        #sidebarToggle.collapsed {
+            left: 0;
+        }
+
+        .controls-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 14px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #moveList {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        #moveList .move-pair {
+            margin-bottom: 5px;
+        }
+
+        #moveList .move-number {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #3498db;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        select option {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="timersTop" class="timers-group">
+            <div id="blackTimerTop" class="timer">⚫ 10:00</div>
+            <div id="whiteTimerTop" class="timer">⚪ 10:00</div>
+        </div>
+        <div id="board"></div>
+        <div id="timersBottom" class="timers-group">
+            <div id="whiteTimerBottom" class="timer">⚪ 10:00</div>
+            <div id="blackTimerBottom" class="timer">⚫ 10:00</div>
+        </div>
+    </div>
+    <div id="status"></div>
+
+    <button id="sidebarToggle">◄</button>
+
+    <div id="sidebar">
+        <h3>Time Control</h3>
+        <select id="timeControl">
+            <option value="600:0">10+0 (Rapid)</option>
+            <option value="300:0">5+0 (Blitz)</option>
+            <option value="300:3">5+3 (Blitz)</option>
+            <option value="180:2">3+2 (Blitz)</option>
+            <option value="180:0">3+0 (Blitz)</option>
+            <option value="60:0">1+0 (Bullet)</option>
+            <option value="900:10">15+10 (Rapid)</option>
+            <option value="1800:0">30+0 (Classical)</option>
+        </select>
+
+        <h3>Game Controls</h3>
+        <div class="controls-group">
+            <button id="newGame">New Game</button>
+            <button id="takeBack">Take Back</button>
+            <button id="flipBoard">Flip Board</button>
+            <button id="clearStorage">Clear Saved</button>
+        </div>
+
+        <h3>Navigation</h3>
+        <div class="controls-row">
+            <button id="navFirst">|◄</button>
+            <button id="navPrev">◄</button>
+            <button id="navNext">►</button>
+            <button id="navLast">►|</button>
+        </div>
+
+        <h3>Move History (PGN)</h3>
+        <div id="moveList">No moves yet</div>
+    </div>
+
+    <script>
+        // Unicode chess pieces
+        const PIECES = {
+            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+        };
+
+        // Storage Manager
+        class StorageManager {
+            static save(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to save to localStorage:', e);
+                }
+            }
+
+            static load(key) {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : null;
+                } catch (e) {
+                    console.error('Failed to load from localStorage:', e);
+                    return null;
+                }
+            }
+
+            static clear(key) {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    console.error('Failed to clear localStorage:', e);
+                }
+            }
+        }
+
+        // Game State Manager
+        class GameState {
+            constructor() {
+                this.chess = new Chess();
+                this.parseTimeControl();
+                this.lastUpdate = Date.now();
+                this.gameOver = false;
+                this.gameStarted = false;
+                this.moveHistory = [];
+                this.pgnMoves = [];
+                this.currentMoveIndex = -1;
+                this.loadState();
+            }
+
+            parseTimeControl() {
+                const select = document.getElementById('timeControl');
+                const value = select ? select.value : '600:0';
+                const [time, increment] = value.split(':').map(Number);
+                this.initialTime = time;
+                this.increment = increment;
+                this.whiteTime = time;
+                this.blackTime = time;
+            }
+
+            makeMove(from, to) {
+                // If viewing history, return to current position first
+                if (this.currentMoveIndex < this.moveHistory.length - 1) {
+                    this.goToMove(this.moveHistory.length - 1);
+                }
+
+                const move = this.chess.move({ from, to, promotion: 'q' });
+                if (move) {
+                    // Start clock on first move
+                    if (!this.gameStarted) {
+                        this.gameStarted = true;
+                        this.lastUpdate = Date.now();
+                    }
+
+                    this.updateTimer();
+
+                    // Add increment to the player who just moved
+                    if (this.increment > 0) {
+                        if (this.chess.turn() === 'b') {
+                            // White just moved
+                            this.whiteTime += this.increment;
+                        } else {
+                            // Black just moved
+                            this.blackTime += this.increment;
+                        }
+                    }
+
+                    this.moveHistory.push(this.chess.fen());
+                    this.pgnMoves.push(move.san);
+                    this.currentMoveIndex = this.moveHistory.length - 1;
+                    this.saveState();
+                    this.updateMoveList();
+                    return this.checkGameStatus();
+                }
+                return null;
+            }
+
+            updateMoveList() {
+                const moveListEl = document.getElementById('moveList');
+                if (this.pgnMoves.length === 0) {
+                    moveListEl.innerHTML = 'No moves yet';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < this.pgnMoves.length; i += 2) {
+                    const moveNum = Math.floor(i / 2) + 1;
+                    const whiteMove = this.pgnMoves[i];
+                    const blackMove = this.pgnMoves[i + 1] || '';
+                    html += `<div class="move-pair"><span class="move-number">${moveNum}.</span> ${whiteMove} ${blackMove}</div>`;
+                }
+                moveListEl.innerHTML = html;
+                moveListEl.scrollTop = moveListEl.scrollHeight;
+            }
+
+            updateTimer() {
+                if (!this.gameStarted) return;
+
+                const now = Date.now();
+                const elapsed = (now - this.lastUpdate) / 1000;
+
+                if (this.chess.turn() === 'w') {
+                    this.whiteTime = Math.max(0, this.whiteTime - elapsed);
+                } else {
+                    this.blackTime = Math.max(0, this.blackTime - elapsed);
+                }
+
+                this.lastUpdate = now;
+
+                if (this.whiteTime <= 0 || this.blackTime <= 0) {
+                    this.gameOver = true;
+                }
+            }
+
+            goToMove(index) {
+                if (index < 0 || index >= this.moveHistory.length) return;
+                this.currentMoveIndex = index;
+                this.chess.load(this.moveHistory[index]);
+            }
+
+            goToStart() {
+                this.chess.reset();
+                this.currentMoveIndex = -1;
+            }
+
+            goToPrevMove() {
+                if (this.currentMoveIndex > -1) {
+                    this.currentMoveIndex--;
+                    if (this.currentMoveIndex === -1) {
+                        this.chess.reset();
+                    } else {
+                        this.chess.load(this.moveHistory[this.currentMoveIndex]);
+                    }
+                }
+            }
+
+            goToNextMove() {
+                if (this.currentMoveIndex < this.moveHistory.length - 1) {
+                    this.currentMoveIndex++;
+                    this.chess.load(this.moveHistory[this.currentMoveIndex]);
+                }
+            }
+
+            goToEnd() {
+                if (this.moveHistory.length > 0) {
+                    this.currentMoveIndex = this.moveHistory.length - 1;
+                    this.chess.load(this.moveHistory[this.currentMoveIndex]);
+                }
+            }
+
+            takeBack() {
+                if (this.moveHistory.length > 0) {
+                    // Remove last move from history
+                    this.moveHistory.pop();
+                    this.pgnMoves.pop();
+
+                    // Go back to previous position
+                    if (this.moveHistory.length > 0) {
+                        this.currentMoveIndex = this.moveHistory.length - 1;
+                        this.chess.load(this.moveHistory[this.currentMoveIndex]);
+                    } else {
+                        // No moves left, reset to start
+                        this.chess.reset();
+                        this.currentMoveIndex = -1;
+                        this.gameStarted = false;
+                    }
+
+                    this.gameOver = false;
+                    this.saveState();
+                    this.updateMoveList();
+                    return true;
+                }
+                return false;
+            }
+
+            checkGameStatus() {
+                if (this.chess.in_checkmate()) {
+                    this.gameOver = true;
+                    return `Checkmate! ${this.chess.turn() === 'w' ? 'Black' : 'White'} wins!`;
+                }
+                if (this.chess.in_draw()) {
+                    this.gameOver = true;
+                    return "Draw!";
+                }
+                if (this.chess.in_stalemate()) {
+                    this.gameOver = true;
+                    return "Stalemate!";
+                }
+                if (this.chess.in_check()) {
+                    return "Check!";
+                }
+                return null;
+            }
+
+            saveState() {
+                StorageManager.save('chessGame', {
+                    fen: this.chess.fen(),
+                    whiteTime: this.whiteTime,
+                    blackTime: this.blackTime,
+                    lastUpdate: this.lastUpdate,
+                    gameOver: this.gameOver,
+                    gameStarted: this.gameStarted,
+                    moveHistory: this.moveHistory,
+                    pgnMoves: this.pgnMoves,
+                    currentMoveIndex: this.currentMoveIndex,
+                    initialTime: this.initialTime,
+                    increment: this.increment
+                });
+            }
+
+            loadState() {
+                const saved = StorageManager.load('chessGame');
+                if (saved) {
+                    this.chess.load(saved.fen);
+                    this.whiteTime = saved.whiteTime;
+                    this.blackTime = saved.blackTime;
+                    this.lastUpdate = Date.now();
+                    this.gameOver = saved.gameOver;
+                    this.gameStarted = saved.gameStarted || false;
+                    this.moveHistory = saved.moveHistory || [];
+                    this.pgnMoves = saved.pgnMoves || [];
+                    this.currentMoveIndex = saved.currentMoveIndex ?? -1;
+                    this.initialTime = saved.initialTime || 600;
+                    this.increment = saved.increment || 0;
+                    this.updateMoveList();
+                }
+            }
+
+            reset() {
+                this.chess.reset();
+                this.parseTimeControl();
+                this.lastUpdate = Date.now();
+                this.gameOver = false;
+                this.gameStarted = false;
+                this.moveHistory = [];
+                this.pgnMoves = [];
+                this.currentMoveIndex = -1;
+                this.saveState();
+                this.updateMoveList();
+            }
+
+            clearSaved() {
+                StorageManager.clear('chessGame');
+            }
+        }
+
+        // Board Renderer
+        class BoardRenderer {
+            constructor(boardElement, gameState) {
+                this.boardElement = boardElement;
+                this.gameState = gameState;
+                this.squares = [];
+                this.selectedSquare = null;
+                this.legalMoves = [];
+                this.flipped = false;
+                this.draggedFrom = null;
+                this.render();
+            }
+
+            flipBoard() {
+                this.flipped = !this.flipped;
+                this.render();
+            }
+
+            render() {
+                this.boardElement.innerHTML = '';
+                this.squares = [];
+
+                const board = this.gameState.chess.board();
+                const inCheck = this.gameState.chess.in_check();
+                const currentTurn = this.gameState.chess.turn();
+
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const displayRow = this.flipped ? 7 - row : row;
+                        const displayCol = this.flipped ? 7 - col : col;
+
+                        const square = document.createElement('div');
+                        square.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
+
+                        const file = String.fromCharCode(97 + col);
+                        const rank = 8 - row;
+                        const position = file + rank;
+                        square.dataset.position = position;
+
+                        // Add coordinates on edges
+                        const isLeftEdge = col === 0;
+                        const isRightEdge = col === 7;
+                        const isTopEdge = row === 0;
+                        const isBottomEdge = row === 7;
+
+                        const piece = board[displayRow][displayCol];
+                        if (piece) {
+                            const pieceChar = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
+                            const colorClass = piece.color === 'b' ? ' black' : ' white';
+
+                            // Add check indicator to king in check
+                            const checkClass = (inCheck && piece.type === 'k' && piece.color === currentTurn) ? ' in-check' : '';
+
+                            const pieceElement = document.createElement('span');
+                            pieceElement.className = `piece${colorClass}${checkClass}`;
+                            pieceElement.textContent = PIECES[pieceChar];
+                            pieceElement.draggable = true;
+                            pieceElement.addEventListener('dragstart', (e) => this.handleDragStart(e, position));
+
+                            square.appendChild(pieceElement);
+                            square.classList.add('has-piece');
+                        }
+
+                        // Add coordinate labels
+                        if (isBottomEdge) {
+                            const fileLabel = document.createElement('div');
+                            fileLabel.className = 'coord-file';
+                            fileLabel.textContent = file;
+                            square.appendChild(fileLabel);
+                        }
+                        if (isLeftEdge) {
+                            const rankLabel = document.createElement('div');
+                            rankLabel.className = 'coord-rank';
+                            rankLabel.textContent = rank;
+                            square.appendChild(rankLabel);
+                        }
+
+                        square.addEventListener('click', () => this.handleSquareClick(position));
+                        square.addEventListener('dragover', (e) => this.handleDragOver(e, square));
+                        square.addEventListener('dragleave', (e) => this.handleDragLeave(e, square));
+                        square.addEventListener('drop', (e) => this.handleDrop(e, position));
+
+                        this.boardElement.appendChild(square);
+                        this.squares.push({ element: square, position });
+                    }
+                }
+            }
+
+            handleSquareClick(position) {
+                if (this.gameState.gameOver) return;
+                
+                if (this.selectedSquare) {
+                    if (this.legalMoves.includes(position)) {
+                        const status = this.gameState.makeMove(this.selectedSquare, position);
+                        this.render();
+                        if (status) {
+                            this.showStatus(status);
+                        }
+                    }
+                    this.clearSelection();
+                } else {
+                    const piece = this.gameState.chess.get(position);
+                    if (piece && piece.color === this.gameState.chess.turn()) {
+                        this.selectSquare(position);
+                    }
+                }
+            }
+
+            selectSquare(position) {
+                this.selectedSquare = position;
+                this.legalMoves = this.gameState.chess.moves({ square: position, verbose: true })
+                    .map(move => move.to);
+                
+                this.squares.forEach(({ element, position: pos }) => {
+                    if (pos === position) {
+                        element.classList.add('selected');
+                    } else if (this.legalMoves.includes(pos)) {
+                        element.classList.add('legal-move');
+                    }
+                });
+            }
+
+            clearSelection() {
+                this.selectedSquare = null;
+                this.legalMoves = [];
+                this.squares.forEach(({ element }) => {
+                    element.classList.remove('selected', 'legal-move');
+                });
+            }
+
+            handleDragStart(e, position) {
+                if (this.gameState.gameOver) {
+                    e.preventDefault();
+                    return;
+                }
+
+                const piece = this.gameState.chess.get(position);
+                if (!piece || piece.color !== this.gameState.chess.turn()) {
+                    e.preventDefault();
+                    return;
+                }
+
+                this.draggedFrom = position;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', position);
+            }
+
+            handleDragOver(e, square) {
+                if (!this.draggedFrom) return;
+
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                square.classList.add('drag-over');
+            }
+
+            handleDragLeave(e, square) {
+                square.classList.remove('drag-over');
+            }
+
+            handleDrop(e, position) {
+                e.preventDefault();
+
+                this.squares.forEach(({ element }) => {
+                    element.classList.remove('drag-over');
+                });
+
+                if (!this.draggedFrom || this.draggedFrom === position) {
+                    this.draggedFrom = null;
+                    return;
+                }
+
+                const status = this.gameState.makeMove(this.draggedFrom, position);
+                this.render();
+                if (status) {
+                    this.showStatus(status);
+                }
+
+                this.draggedFrom = null;
+            }
+
+            showStatus(message) {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.style.display = 'block';
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Timer Display
+        class TimerDisplay {
+            constructor(gameState) {
+                this.gameState = gameState;
+                this.elements = {
+                    whiteTop: document.getElementById('whiteTimerTop'),
+                    whiteBottom: document.getElementById('whiteTimerBottom'),
+                    blackTop: document.getElementById('blackTimerTop'),
+                    blackBottom: document.getElementById('blackTimerBottom')
+                };
+                this.update();
+                setInterval(() => this.update(), 100);
+            }
+
+            update() {
+                if (!this.gameState.gameOver) {
+                    this.gameState.updateTimer();
+                }
+
+                const whiteTime = this.formatTime(this.gameState.whiteTime);
+                const blackTime = this.formatTime(this.gameState.blackTime);
+
+                this.elements.whiteTop.textContent = '⚪ ' + whiteTime;
+                this.elements.whiteBottom.textContent = '⚪ ' + whiteTime;
+                this.elements.blackTop.textContent = '⚫ ' + blackTime;
+                this.elements.blackBottom.textContent = '⚫ ' + blackTime;
+
+                const isWhiteTurn = this.gameState.chess.turn() === 'w';
+
+                // Only player's own clock on their side should be green (left side from their view)
+                this.elements.whiteBottom.classList.toggle('active', isWhiteTurn);
+                this.elements.blackTop.classList.toggle('active', !isWhiteTurn);
+                this.elements.whiteTop.classList.remove('active');
+                this.elements.blackBottom.classList.remove('active');
+
+                if (this.gameState.whiteTime <= 0 && !this.gameState.gameOver) {
+                    this.gameState.gameOver = true;
+                    this.showStatus('Time up! Black wins!');
+                } else if (this.gameState.blackTime <= 0 && !this.gameState.gameOver) {
+                    this.gameState.gameOver = true;
+                    this.showStatus('Time up! White wins!');
+                }
+            }
+
+            formatTime(seconds) {
+                seconds = Math.max(0, seconds);
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            showStatus(message) {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.style.display = 'block';
+            }
+        }
+
+        // Main Game Controller
+        class ChessGame {
+            constructor() {
+                this.gameState = new GameState();
+                this.board = new BoardRenderer(
+                    document.getElementById('board'),
+                    this.gameState
+                );
+                this.timer = new TimerDisplay(this.gameState);
+                this.setupControls();
+            }
+
+            setupControls() {
+                document.getElementById('newGame').addEventListener('click', () => {
+                    this.gameState.reset();
+                    this.board.render();
+                    document.getElementById('status').style.display = 'none';
+                });
+
+                document.getElementById('flipBoard').addEventListener('click', () => {
+                    this.board.flipBoard();
+                });
+
+                document.getElementById('takeBack').addEventListener('click', () => {
+                    if (this.gameState.takeBack()) {
+                        this.board.render();
+                        document.getElementById('status').style.display = 'none';
+                    }
+                });
+
+                document.getElementById('clearStorage').addEventListener('click', () => {
+                    if (confirm('Clear saved game and start fresh?')) {
+                        this.gameState.clearSaved();
+                        this.gameState.reset();
+                        this.board.render();
+                        document.getElementById('status').style.display = 'none';
+                    }
+                });
+
+                // Navigation controls
+                document.getElementById('navFirst').addEventListener('click', () => {
+                    this.gameState.goToStart();
+                    this.board.render();
+                });
+
+                document.getElementById('navPrev').addEventListener('click', () => {
+                    this.gameState.goToPrevMove();
+                    this.board.render();
+                });
+
+                document.getElementById('navNext').addEventListener('click', () => {
+                    this.gameState.goToNextMove();
+                    this.board.render();
+                });
+
+                document.getElementById('navLast').addEventListener('click', () => {
+                    this.gameState.goToEnd();
+                    this.board.render();
+                });
+
+                // Time control change
+                document.getElementById('timeControl').addEventListener('change', () => {
+                    if (confirm('Change time control? This will start a new game.')) {
+                        this.gameState.reset();
+                        this.board.render();
+                        document.getElementById('status').style.display = 'none';
+                    }
+                });
+
+                // Sidebar toggle
+                const sidebar = document.getElementById('sidebar');
+                const toggleBtn = document.getElementById('sidebarToggle');
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    toggleBtn.classList.toggle('collapsed');
+                    // Arrow points in the direction the sidebar will move
+                    toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '►' : '◄';
+                });
+            }
+        }
+
+        // Start the game
+        new ChessGame();
+    </script>
+</body>
+</html>

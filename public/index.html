@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabletop Chess</title>
+    <title>1on1chess.com - Tabletop Chess for Two Players</title>
+    <meta name="description" content="Play chess face-to-face on tablets and iPads. Two players, one device. Features dual timers, move validation, and fullscreen mode for optimal tabletop play.">
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+            crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <style>
         * {
@@ -296,6 +302,21 @@
             color: #3498db;
         }
 
+        .ad-container {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-container ins {
+            width: 100%;
+        }
+
         select {
             width: 100%;
             padding: 12px;
@@ -476,6 +497,24 @@
 
         <h3>Move History (PGN)</h3>
         <div id="moveList">No moves yet</div>
+
+        <!-- AdSense Ad Unit -->
+        <div class="ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="YYYYYYYYYY"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <!-- Privacy Policy Link -->
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+            <a href="/privacy.html" style="color: #3498db; text-decoration: none; font-size: 12px;">Privacy Policy</a>
+        </div>
     </div>
 
     <script>

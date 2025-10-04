@@ -7,3 +7,12 @@
 
 # OS
 .DS_Store
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.firebaserc
+
+# Firebase config (contains API keys - already tracked, but sensitive)
+firebase-config.js

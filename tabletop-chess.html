@@ -313,6 +313,34 @@
             background: #2c3e50;
             color: white;
         }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .piece.rotate-for-turn {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -343,6 +371,18 @@
             <option value="900:10">15+10 (Rapid)</option>
             <option value="1800:0">30+0 (Classical)</option>
         </select>
+
+        <h3>Piece Rotation</h3>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="rotationFixed" name="rotationMode" value="fixed" checked>
+                <label for="rotationFixed">Fixed (Black pieces rotated)</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="rotationTurnBased" name="rotationMode" value="turn-based">
+                <label for="rotationTurnBased">Turn-based (Rotate to current player)</label>
+            </div>
+        </div>
 
         <h3>Game Controls</h3>
         <div class="controls-group">
@@ -640,6 +680,18 @@
                 this.legalMoves = [];
                 this.flipped = false;
                 this.draggedFrom = null;
+                this.rotationMode = this.loadRotationMode();
+                this.render();
+            }
+
+            loadRotationMode() {
+                const saved = localStorage.getItem('rotationMode');
+                return saved || 'fixed';
+            }
+
+            setRotationMode(mode) {
+                this.rotationMode = mode;
+                localStorage.setItem('rotationMode', mode);
                 this.render();
             }
 
@@ -683,8 +735,20 @@
                             // Add check indicator to king in check
                             const checkClass = (inCheck && piece.type === 'k' && piece.color === currentTurn) ? ' in-check' : '';
 
+                            // Determine rotation based on mode
+                            let rotationClass = '';
+                            if (this.rotationMode === 'fixed') {
+                                // Fixed mode: only black pieces are rotated (handled by .piece.black CSS)
+                                rotationClass = '';
+                            } else if (this.rotationMode === 'turn-based') {
+                                // Turn-based mode: rotate all pieces when it's black's turn
+                                if (currentTurn === 'b') {
+                                    rotationClass = ' rotate-for-turn';
+                                }
+                            }
+
                             const pieceElement = document.createElement('span');
-                            pieceElement.className = `piece${colorClass}${checkClass}`;
+                            pieceElement.className = `piece${colorClass}${checkClass}${rotationClass}`;
                             pieceElement.textContent = PIECES[pieceChar];
                             pieceElement.draggable = true;
                             pieceElement.addEventListener('dragstart', (e) => this.handleDragStart(e, position));
@@ -948,6 +1012,21 @@
                         this.board.render();
                         document.getElementById('status').style.display = 'none';
                     }
+                });
+
+                // Rotation mode
+                const rotationRadios = document.querySelectorAll('input[name="rotationMode"]');
+                // Initialize radio buttons from saved state
+                const savedMode = this.board.rotationMode;
+                rotationRadios.forEach(radio => {
+                    if (radio.value === savedMode) {
+                        radio.checked = true;
+                    }
+                    radio.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            this.board.setRotationMode(e.target.value);
+                        }
+                    });
                 });
 
                 // Sidebar toggle

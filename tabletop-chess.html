@@ -341,9 +341,40 @@
         .piece.rotate-for-turn {
             transform: rotate(180deg);
         }
+
+        #fullscreenExit {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: all 0.3s;
+        }
+
+        #fullscreenExit:hover {
+            background: rgba(255, 0, 0, 0.8);
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        #fullscreenExit.visible {
+            display: flex;
+        }
     </style>
 </head>
 <body>
+    <button id="fullscreenExit">×</button>
     <div id="gameContainer">
         <div id="timersTop" class="timers-group">
             <div id="blackTimerTop" class="timer">⚫ 10:00</div>
@@ -389,6 +420,7 @@
             <button id="newGame">New Game</button>
             <button id="takeBack">Take Back</button>
             <button id="flipBoard">Flip Board</button>
+            <button id="fullscreenBtn">Fullscreen</button>
             <button id="clearStorage">Clear Saved</button>
         </div>
 
@@ -1047,6 +1079,28 @@
                     });
                 });
 
+                // Fullscreen button
+                document.getElementById('fullscreenBtn').addEventListener('click', () => {
+                    this.enterFullscreen();
+                });
+
+                // Fullscreen exit button
+                document.getElementById('fullscreenExit').addEventListener('click', () => {
+                    this.exitFullscreen();
+                });
+
+                // Double-click to exit fullscreen
+                document.addEventListener('dblclick', () => {
+                    if (document.fullscreenElement) {
+                        this.exitFullscreen();
+                    }
+                });
+
+                // Listen for fullscreen changes
+                document.addEventListener('fullscreenchange', () => {
+                    this.updateFullscreenUI();
+                });
+
                 // Sidebar toggle
                 const sidebar = document.getElementById('sidebar');
                 const toggleBtn = document.getElementById('sidebarToggle');
@@ -1056,6 +1110,33 @@
                     // Arrow points in the direction the sidebar will move
                     toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '►' : '◄';
                 });
+            }
+
+            enterFullscreen() {
+                if (!document.fullscreenElement) {
+                    // Try native fullscreen API first (works on mobile/tablet)
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(err => {
+                            console.log('Native fullscreen not available, using fallback');
+                        });
+                    }
+                }
+            }
+
+            exitFullscreen() {
+                if (document.fullscreenElement && document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+
+            updateFullscreenUI() {
+                const exitBtn = document.getElementById('fullscreenExit');
+                // Show exit button when in fullscreen mode
+                if (document.fullscreenElement) {
+                    exitBtn.classList.add('visible');
+                } else {
+                    exitBtn.classList.remove('visible');
+                }
             }
 
             setupFullscreenGestures() {

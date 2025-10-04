@@ -726,7 +726,7 @@
                     return "Stalemate!";
                 }
                 if (this.chess.in_check()) {
-                    return "Check!";
+                    return null;  // Don't show alert, red glow around king is enough
                 }
                 return null;
             }

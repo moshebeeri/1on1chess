@@ -887,7 +887,10 @@
                     this.gameState
                 );
                 this.timer = new TimerDisplay(this.gameState);
+                this.lastTwoFingerTap = 0;
+                this.initialPinchDistance = 0;
                 this.setupControls();
+                this.setupFullscreenGestures();
             }
 
             setupControls() {
@@ -956,6 +959,69 @@
                     // Arrow points in the direction the sidebar will move
                     toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '►' : '◄';
                 });
+            }
+
+            setupFullscreenGestures() {
+                let touchStartTime = 0;
+
+                document.body.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        touchStartTime = Date.now();
+                        const touch1 = e.touches[0];
+                        const touch2 = e.touches[1];
+                        this.initialPinchDistance = this.getTouchDistance(touch1, touch2);
+                    }
+                });
+
+                document.body.addEventListener('touchend', (e) => {
+                    if (e.changedTouches.length === 2) {
+                        const now = Date.now();
+                        const tapDuration = now - touchStartTime;
+
+                        // Double two-finger tap detection (tap < 300ms)
+                        if (tapDuration < 300) {
+                            const timeSinceLastTap = now - this.lastTwoFingerTap;
+                            if (timeSinceLastTap < 500) {
+                                this.toggleFullscreen();
+                                this.lastTwoFingerTap = 0;
+                            } else {
+                                this.lastTwoFingerTap = now;
+                            }
+                        }
+                    }
+                });
+
+                document.body.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 2) {
+                        const touch1 = e.touches[0];
+                        const touch2 = e.touches[1];
+                        const currentDistance = this.getTouchDistance(touch1, touch2);
+
+                        // Detect pinch out (spread) gesture - increase of 100px or more
+                        if (this.initialPinchDistance > 0 && currentDistance - this.initialPinchDistance > 100) {
+                            this.toggleFullscreen();
+                            this.initialPinchDistance = 0;
+                        }
+                    }
+                });
+            }
+
+            getTouchDistance(touch1, touch2) {
+                const dx = touch2.clientX - touch1.clientX;
+                const dy = touch2.clientY - touch1.clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Fullscreen request failed:', err);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
             }
         }
 

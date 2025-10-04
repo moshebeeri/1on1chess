@@ -730,18 +730,20 @@
                         const piece = board[displayRow][displayCol];
                         if (piece) {
                             const pieceChar = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
-                            const colorClass = piece.color === 'b' ? ' black' : ' white';
 
                             // Add check indicator to king in check
                             const checkClass = (inCheck && piece.type === 'k' && piece.color === currentTurn) ? ' in-check' : '';
 
-                            // Determine rotation based on mode
+                            // Determine rotation and color class based on mode
+                            let colorClass = '';
                             let rotationClass = '';
+
                             if (this.rotationMode === 'fixed') {
-                                // Fixed mode: only black pieces are rotated (handled by .piece.black CSS)
-                                rotationClass = '';
+                                // Fixed mode: apply color class (black pieces get rotated via .piece.black CSS)
+                                colorClass = piece.color === 'b' ? ' black' : ' white';
                             } else if (this.rotationMode === 'turn-based') {
-                                // Turn-based mode: rotate all pieces when it's black's turn
+                                // Turn-based mode: only apply white class for styling, rotate all pieces on black's turn
+                                colorClass = piece.color === 'w' ? ' white' : '';
                                 if (currentTurn === 'b') {
                                     rotationClass = ' rotate-for-turn';
                                 }
@@ -839,6 +841,20 @@
                 this.draggedFrom = position;
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', position);
+
+                // Create a better drag image for white pieces visibility
+                const dragElement = e.target.cloneNode(true);
+                dragElement.style.position = 'absolute';
+                dragElement.style.top = '-1000px';
+                dragElement.style.fontSize = '7vmin';
+                dragElement.style.padding = '10px';
+                dragElement.style.background = 'rgba(0, 0, 0, 0.1)';
+                dragElement.style.borderRadius = '5px';
+                document.body.appendChild(dragElement);
+
+                e.dataTransfer.setDragImage(dragElement, 25, 25);
+
+                setTimeout(() => document.body.removeChild(dragElement), 0);
             }
 
             handleDragOver(e, square) {
@@ -921,9 +937,11 @@
 
                 if (this.gameState.whiteTime <= 0 && !this.gameState.gameOver) {
                     this.gameState.gameOver = true;
+                    this.gameState.saveState();
                     this.showStatus('Time up! Black wins!');
                 } else if (this.gameState.blackTime <= 0 && !this.gameState.gameOver) {
                     this.gameState.gameOver = true;
+                    this.gameState.saveState();
                     this.showStatus('Time up! White wins!');
                 }
             }

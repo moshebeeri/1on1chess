@@ -175,6 +175,8 @@ Attribution Example:
         .piece.black {
             display: inline-block;
             transform: rotate(180deg);
+            color: #2c3e50;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5), 0 0 2px rgba(255, 255, 255, 0.5);
         }
 
         .piece.in-check {
@@ -686,9 +688,10 @@ Attribution Example:
 
     <script>
         // Unicode chess pieces
+        // Use outlined (white) Unicode chars for both colors, CSS handles styling
         const PIECES = {
             'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+            'k': '♔', 'q': '♕', 'r': '♖', 'b': '♗', 'n': '♘', 'p': '♙'
         };
 
         // Storage Manager

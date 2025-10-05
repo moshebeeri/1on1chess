@@ -37,7 +37,60 @@ Attribution Example:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1on1chess.com - Tabletop Chess for Two Players</title>
+    <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free tabletop chess game for tablets and mobile phones. Perfect for travelers! Works offline, saves game state, includes chess clock. Replace your chess board with your iPad or tablet. Best offline chess solution.">
+    <meta name="keywords" content="tabletop chess, chess for tablets, chess for iPad, mobile chess, offline chess, chess clock, travel chess, chess timer, two player chess, chess board replacement, tablet chess game, chess for travelers">
+    <meta name="author" content="Moshe Beeri">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2c3e50">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://1on1chess.com/">
+    <meta property="og:title" content="1on1chess.com - Free Tabletop Chess for Tablets & Mobile">
+    <meta property="og:description" content="Perfect chess solution for travelers! Works offline, includes chess clock, saves game state. Replace your chess board with your tablet or phone.">
+    <meta property="og:site_name" content="1on1chess.com">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://1on1chess.com/">
+    <meta name="twitter:title" content="1on1chess.com - Free Tabletop Chess for Tablets & Mobile">
+    <meta name="twitter:description" content="Perfect chess solution for travelers! Works offline, includes chess clock, saves game state. Replace your chess board with your tablet.">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "1on1chess.com",
+      "applicationCategory": "Game",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free tabletop chess game for tablets and mobile phones. Perfect for travelers! Works offline, saves game state, includes built-in chess clock. Replace your chess board with your iPad or tablet.",
+      "browserRequirements": "Requires JavaScript",
+      "url": "https://1on1chess.com",
+      "author": {
+        "@type": "Person",
+        "name": "Moshe Beeri"
+      },
+      "featureList": [
+        "Offline gameplay",
+        "Game state persistence",
+        "Built-in chess clock",
+        "Multiple time controls",
+        "Move history tracking",
+        "Works on tablets and mobile phones",
+        "No installation required",
+        "Perfect for travel"
+      ]
+    }
+    </script>
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2677607454451891"
@@ -550,6 +603,19 @@ Attribution Example:
             text-decoration: underline;
         }
 
+        /* SEO Content - Visually hidden but accessible to screen readers and search engines */
+        .seo-content {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
         /* Hide banner in fullscreen mode */
         #gameContainer.fullscreen-mode ~ .banner-ad,
         :fullscreen .banner-ad,
@@ -591,6 +657,25 @@ Attribution Example:
     </style>
 </head>
 <body>
+    <!-- SEO Content - Hidden but indexed by search engines -->
+    <div class="seo-content">
+        <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
+        <h2>The Best Chess Solution for Travelers - Works Offline!</h2>
+        <p>1on1chess.com is the perfect digital chess board replacement for your iPad, tablet, or mobile phone. Designed specifically for tabletop play, this free chess application is ideal for travelers and anyone who wants to play chess without carrying a physical board.</p>
+        <h3>Key Features:</h3>
+        <ul>
+            <li>Works completely offline - no internet connection required</li>
+            <li>Built-in chess clock with multiple time controls (Bullet, Blitz, Rapid, Classical)</li>
+            <li>Automatic game state saving - never lose your game</li>
+            <li>Perfect for tablets and mobile devices (iPad, iPhone, Android)</li>
+            <li>Designed for tabletop play - both players can see the board</li>
+            <li>Move history and PGN notation tracking</li>
+            <li>No installation required - works in your browser</li>
+            <li>Free and open source</li>
+        </ul>
+        <p>Replace your chess board with your tablet. Perfect for travel, coffee shops, parks, or anywhere you want to play chess. The best offline chess clock and board combination for mobile devices.</p>
+    </div>
+
     <button id="fullscreenExit">×</button>
 
     <!-- Top Banner Ad -->

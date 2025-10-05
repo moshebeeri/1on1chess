@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.0">
+    <meta name="build-number" content="1.0.1">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -687,7 +687,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.0 | Date: 2025-01-05 | Font: DejaVu Sans, Noto Sans Symbols -->
+    <!-- Build: 1.0.1 | Date: 2025-01-05 | Fix: Mobile centering -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
@@ -1477,28 +1477,35 @@ Attribution Example:
 
                 this.lastLayoutState = currentState;
 
-                // Toggle button width - only takes space when sidebar is collapsed
-                const toggleButtonWidth = sidebarVisible ? 0 : 60;
+                // On mobile (< 768px), don't apply margins - let CSS auto-centering handle it
+                const isMobile = viewportWidth < 768;
 
-                // Set margins on gameContainer to account for toggle button
-                // This ensures the component (board + timers) is centered with space for toggle button
-                if (sidebarVisible) {
-                    // Sidebar open: account for sidebar width
-                    if (sidebarFlipped) {
-                        this.gameContainer.style.marginLeft = '0';
-                        this.gameContainer.style.marginRight = `${sidebarWidth}px`;
-                    } else {
-                        this.gameContainer.style.marginLeft = `${sidebarWidth}px`;
-                        this.gameContainer.style.marginRight = '0';
-                    }
+                if (isMobile) {
+                    // Mobile: reset margins to allow CSS auto-centering
+                    this.gameContainer.style.marginLeft = '';
+                    this.gameContainer.style.marginRight = '';
                 } else {
-                    // Sidebar collapsed: account for toggle button
-                    if (sidebarFlipped) {
-                        this.gameContainer.style.marginLeft = '0';
-                        this.gameContainer.style.marginRight = `${toggleButtonWidth}px`;
+                    // Desktop/Tablet: account for sidebar/toggle button
+                    const toggleButtonWidth = sidebarVisible ? 0 : 60;
+
+                    if (sidebarVisible) {
+                        // Sidebar open: account for sidebar width
+                        if (sidebarFlipped) {
+                            this.gameContainer.style.marginLeft = '0';
+                            this.gameContainer.style.marginRight = `${sidebarWidth}px`;
+                        } else {
+                            this.gameContainer.style.marginLeft = `${sidebarWidth}px`;
+                            this.gameContainer.style.marginRight = '0';
+                        }
                     } else {
-                        this.gameContainer.style.marginLeft = `${toggleButtonWidth}px`;
-                        this.gameContainer.style.marginRight = '0';
+                        // Sidebar collapsed: account for toggle button
+                        if (sidebarFlipped) {
+                            this.gameContainer.style.marginLeft = '0';
+                            this.gameContainer.style.marginRight = `${toggleButtonWidth}px`;
+                        } else {
+                            this.gameContainer.style.marginLeft = `${toggleButtonWidth}px`;
+                            this.gameContainer.style.marginRight = '0';
+                        }
                     }
                 }
 

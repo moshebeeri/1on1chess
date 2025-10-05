@@ -227,27 +227,25 @@ Attribution Example:
         }
 
         .piece.white {
+            display: inline-block;
             color: white !important;
+            -webkit-text-fill-color: white !important;
             text-shadow:
-                0 0 3px black,
-                0 0 3px black,
-                0 0 3px black,
-                1px 1px 2px rgba(0, 0, 0, 0.8),
-                -1px -1px 2px rgba(0, 0, 0, 0.8);
-            -webkit-text-fill-color: white;
-            -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3);
+                0 0 2px rgba(0, 0, 0, 0.9),
+                0 0 2px rgba(0, 0, 0, 0.9),
+                1px 1px 1px rgba(0, 0, 0, 0.7),
+                -1px -1px 1px rgba(0, 0, 0, 0.7);
         }
 
         .piece.black {
             display: inline-block;
             transform: rotate(180deg);
-            color: #1a1a1a !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
             text-shadow:
-                0 0 2px rgba(255, 255, 255, 0.6),
-                0 0 2px rgba(255, 255, 255, 0.6),
-                1px 1px 1px rgba(255, 255, 255, 0.4);
-            -webkit-text-fill-color: #1a1a1a;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+                0 0 1px rgba(255, 255, 255, 0.5),
+                0 0 1px rgba(255, 255, 255, 0.5),
+                1px 1px 1px rgba(255, 255, 255, 0.3);
         }
 
         .piece.in-check {
@@ -675,7 +673,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Version: 2025-01-05-unicode-fix -->
+    <!-- Version: 2025-01-05-css-refinement -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>

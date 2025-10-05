@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabletop Chess</title>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2677607454451891"
+            crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <style>
         * {
@@ -435,10 +440,47 @@
         :-ms-fullscreen .coord-rank {
             font-size: 2.5vmin;
         }
+
+        /* Top Banner Ad */
+        .banner-ad {
+            width: 100%;
+            max-width: 970px;
+            margin: 0 auto 2vmin auto;
+            padding: 1vmin;
+            background: rgba(44, 62, 80, 0.5);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+        }
+
+        /* Hide banner in fullscreen mode */
+        #gameContainer.fullscreen-mode ~ .banner-ad,
+        :fullscreen .banner-ad,
+        :-webkit-full-screen .banner-ad,
+        :-moz-full-screen .banner-ad,
+        :-ms-fullscreen .banner-ad {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <button id="fullscreenExit">×</button>
+
+    <!-- Top Banner Ad -->
+    <div class="banner-ad">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-2677607454451891"
+             data-ad-slot="7362018339"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
     <div id="gameContainer">
         <div id="timersTop" class="timers-group">
             <div id="blackTimerTop" class="timer">⚫ 10:00</div>

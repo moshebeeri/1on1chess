@@ -41,12 +41,13 @@
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            width: 60vmin;
-            height: 60vmin;
+            width: 600px; /* Initial size, JavaScript will update */
+            height: 600px;
             aspect-ratio: 1;
             border: 3px solid #34495e;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             transition: width 0.3s, height 0.3s;
+            margin: 0 auto;
         }
         
         .square {
@@ -171,13 +172,13 @@
         }
 
         .timer {
-            font-size: 3vmin;
+            font-size: 2vmin;
             font-weight: bold;
             background: rgba(0, 0, 0, 0.85);
             color: white;
-            padding: 2vmin 3vmin;
+            padding: 1vmin 2vmin;
             border-radius: 1vmin;
-            min-width: 15vmin;
+            min-width: 10vmin;
             text-align: center;
             transition: all 0.3s;
         }
@@ -210,7 +211,7 @@
             width: 350px;
             background: rgba(44, 62, 80, 0.98);
             color: white;
-            padding: 20px;
+            padding: 20px 20px 60px 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
             z-index: 100;
             overflow-y: auto;
@@ -464,87 +465,33 @@
             display: none;
         }
 
-        /* Responsive Design - Mobile & Tablet Optimizations */
+        /* Responsive Design - JavaScript handles sizing, CSS handles edge cases */
 
-        /* Portrait phones: maximize vertical space */
+        /* Hide banner on small screens to save space */
         @media (max-width: 767px) and (orientation: portrait) {
-            #gameContainer {
-                gap: 1vmin;
-                padding: 1vmin;
-            }
-
-            #board {
-                width: 75vmin;
-                height: 75vmin;
-            }
-
-            .square {
-                font-size: 9vmin;
-            }
-
-            .timer {
-                font-size: 2.5vmin;
-                padding: 1.5vmin 2.5vmin;
-                min-width: 12vmin;
-            }
-
-            .timers-group {
-                gap: 1.5vmin;
-            }
-
-            /* Hide top banner on portrait phones to save space */
             .banner-ad {
                 display: none;
             }
-        }
-
-        /* iPad and tablets in landscape: prevent timer overlap */
-        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-            body {
-                justify-content: center;
-                align-items: center;
-            }
 
             #gameContainer {
                 gap: 1vmin;
                 padding: 1vmin;
-                justify-content: center;
-            }
-
-            #board {
-                width: 50vmin;
-                height: 50vmin;
-            }
-
-            .square {
-                font-size: 6vmin;
-            }
-
-            .timer {
-                font-size: 2.5vmin;
-                padding: 1.5vmin 2.5vmin;
-                min-width: 12vmin;
             }
 
             .timers-group {
-                gap: 1.5vmin;
-            }
-
-            .coord-file,
-            .coord-rank {
-                font-size: 1.5vmin;
+                gap: 1vmin;
             }
         }
 
-        /* Tall portrait devices (iPhone Max, etc): use more vertical space */
-        @media (min-aspect-ratio: 1/2) and (max-aspect-ratio: 1/1) and (orientation: portrait) {
-            #board {
-                width: 80vmin;
-                height: 80vmin;
+        /* Reduce gaps on tablets in landscape */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+            #gameContainer {
+                gap: 1vmin;
+                padding: 1vmin;
             }
 
-            .square {
-                font-size: 9.5vmin;
+            .timers-group {
+                gap: 1vmin;
             }
         }
     </style>
@@ -1202,6 +1149,162 @@
             }
         }
 
+        // Responsive Layout Manager
+        class ResponsiveLayoutManager {
+            constructor() {
+                this.board = document.getElementById('board');
+                this.gameContainer = document.getElementById('gameContainer');
+                this.timersTop = document.getElementById('timersTop');
+                this.timersBottom = document.getElementById('timersBottom');
+                this.banner = document.querySelector('.banner-ad');
+                this.sidebar = document.getElementById('sidebar');
+                this.sidebarToggle = document.getElementById('sidebarToggle');
+
+                // Auto-collapse sidebar on mobile devices
+                this.autoCollapseSidebarOnMobile();
+
+                this.updateLayout();
+
+                // Listen for resize and orientation changes
+                window.addEventListener('resize', () => this.updateLayout());
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.updateLayout(), 100);
+                });
+
+                // Listen for sidebar toggle to recalculate layout
+                if (this.sidebarToggle) {
+                    this.sidebarToggle.addEventListener('click', () => {
+                        setTimeout(() => this.updateLayout(), 350); // Wait for transition
+                    });
+                }
+            }
+
+            autoCollapseSidebarOnMobile() {
+                const viewportWidth = window.innerWidth;
+
+                // Auto-collapse sidebar on screens < 768px
+                if (viewportWidth < 768) {
+                    if (!this.sidebar.classList.contains('collapsed')) {
+                        this.sidebar.classList.add('collapsed');
+                        this.sidebarToggle.classList.add('collapsed');
+                        this.sidebarToggle.textContent = '►';
+                    }
+                }
+            }
+
+            optimizeAdDisplay() {
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const isPortrait = viewportHeight > viewportWidth;
+
+                // Auto-collapse sidebar on mobile
+                this.autoCollapseSidebarOnMobile();
+
+                // Hide banner ad on small portrait screens (phones)
+                if (this.banner) {
+                    if (isPortrait && viewportWidth < 768) {
+                        this.banner.style.display = 'none';
+                    } else {
+                        this.banner.style.display = 'flex';
+                    }
+                }
+
+                // Determine optimal ad container height for sidebar ad
+                const sidebarAdContainer = document.querySelector('.ad-container');
+                if (sidebarAdContainer) {
+                    // Responsive ad sizing based on available sidebar space
+                    if (viewportHeight < 700) {
+                        sidebarAdContainer.style.minHeight = '50px'; // Smaller ad
+                    } else if (viewportHeight < 900) {
+                        sidebarAdContainer.style.minHeight = '90px'; // Standard banner
+                    } else {
+                        sidebarAdContainer.style.minHeight = '120px'; // Larger ad
+                    }
+                }
+            }
+
+            updateLayout() {
+                // First optimize ad display
+                this.optimizeAdDisplay();
+
+                // Small delay to let ads resize
+                setTimeout(() => {
+                    this.calculateAndApplyLayout();
+                }, 50);
+            }
+
+            calculateAndApplyLayout() {
+                // Get viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Check if sidebar is visible (not collapsed)
+                const sidebarVisible = !this.sidebar.classList.contains('collapsed');
+                const sidebarWidth = sidebarVisible ? 350 : 0;
+
+                // Available width (account for sidebar)
+                const availableWidth = viewportWidth - sidebarWidth;
+
+                // Measure actual element heights
+                const bannerHeight = this.banner && this.banner.offsetHeight > 0 ? this.banner.offsetHeight : 0;
+                const timersTopHeight = this.timersTop.offsetHeight;
+                const timersBottomHeight = this.timersBottom.offsetHeight;
+
+                // Get computed gaps and padding
+                const containerStyle = window.getComputedStyle(this.gameContainer);
+                const gap = parseFloat(containerStyle.gap) || 0;
+                const padding = parseFloat(containerStyle.padding) || 0;
+
+                // Calculate available space
+                const availableHeight = viewportHeight - bannerHeight - timersTopHeight - timersBottomHeight - (gap * 3) - (padding * 2);
+
+                // Board should be square, use minimum of width and height
+                // Leave some margin (90% of available space)
+                const maxBoardSize = Math.min(
+                    availableWidth * 0.92,
+                    availableHeight * 0.95,
+                    800 // Max size cap for very large screens
+                );
+
+                // Set board size
+                const boardSize = Math.floor(maxBoardSize);
+                this.board.style.width = `${boardSize}px`;
+                this.board.style.height = `${boardSize}px`;
+
+                // Calculate piece size (12.5% of board for each square piece)
+                const squareSize = boardSize / 8;
+                const pieceSize = squareSize * 0.85; // 85% of square size
+
+                // Update piece font size
+                const squares = document.querySelectorAll('.square');
+                squares.forEach(square => {
+                    square.style.fontSize = `${pieceSize}px`;
+                });
+
+                // Update coordinate labels (smaller)
+                const coords = document.querySelectorAll('.coord-file, .coord-rank');
+                coords.forEach(coord => {
+                    coord.style.fontSize = `${squareSize * 0.2}px`;
+                });
+
+                // Update timer sizes based on viewport
+                const timerFontSize = Math.max(12, Math.min(24, viewportHeight * 0.025));
+                const timers = document.querySelectorAll('.timer');
+                timers.forEach(timer => {
+                    timer.style.fontSize = `${timerFontSize}px`;
+                    timer.style.padding = `${timerFontSize * 0.4}px ${timerFontSize * 0.8}px`;
+                });
+
+                // Log layout info for debugging
+                console.log('Layout updated:', {
+                    viewport: `${viewportWidth}x${viewportHeight}`,
+                    availableSpace: `${availableWidth}x${availableHeight}`,
+                    boardSize: `${boardSize}px`,
+                    bannerHeight: `${bannerHeight}px`
+                });
+            }
+        }
+
         // Main Game Controller
         class ChessGame {
             constructor() {
@@ -1211,6 +1314,7 @@
                     this.gameState
                 );
                 this.timer = new TimerDisplay(this.gameState);
+                this.layoutManager = new ResponsiveLayoutManager();
                 this.lastTwoFingerTap = 0;
                 this.initialPinchDistance = 0;
                 this.setupControls();

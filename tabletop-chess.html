@@ -103,6 +103,12 @@ Attribution Example:
             crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <!-- Google Fonts for chess symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -216,6 +222,10 @@ Attribution Example:
         .piece {
             pointer-events: auto;
             cursor: grab;
+            font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", "DejaVu Sans", "Arial Unicode MS", sans-serif;
+            font-variant-emoji: text;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .piece:active {
@@ -673,7 +683,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Version: 2025-01-05-css-refinement -->
+    <!-- Version: 2025-01-05-font-fix -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>

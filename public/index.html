@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.6">
+    <meta name="build-number" content="1.0.8">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -225,12 +225,15 @@ Attribution Example:
         }
         
         .piece {
-            pointer-events: auto;
-            cursor: grab;
+            pointer-events: none;
             font-family: "DejaVu Sans", "Noto Sans Symbols", "Segoe UI Symbol", "Arial Unicode MS", sans-serif;
             font-variant-emoji: text;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        .square.has-piece {
+            cursor: grab;
         }
 
         .piece:active {
@@ -694,7 +697,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.6 | Date: 2025-01-05 | Fix: Drag-and-drop piece size and cursor alignment -->
+    <!-- Build: 1.0.8 | Date: 2025-01-05 | Fix: Handle drag at square level for full area coverage -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
@@ -1178,11 +1181,16 @@ Attribution Example:
                             const pieceElement = document.createElement('span');
                             pieceElement.className = `piece${colorClass}${checkClass}${rotationClass}`;
                             pieceElement.textContent = PIECES[pieceChar];
-                            pieceElement.draggable = true;
-                            pieceElement.addEventListener('dragstart', (e) => this.handleDragStart(e, position));
 
                             square.appendChild(pieceElement);
                             square.classList.add('has-piece');
+
+                            // Make square draggable, not piece (piece is visual only with pointer-events: none)
+                            square.draggable = true;
+                            square.addEventListener('dragstart', (e) => this.handleDragStart(e, position));
+                        } else {
+                            // Empty square - not draggable
+                            square.draggable = false;
                         }
 
                         // Add coordinate labels
@@ -1268,19 +1276,29 @@ Attribution Example:
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', position);
 
-                // Clone the piece element for drag image without extra styling
-                const dragElement = e.target.cloneNode(true);
-                dragElement.style.position = 'absolute';
-                dragElement.style.top = '-1000px';
-                document.body.appendChild(dragElement);
+                // Find the piece element within the square (e.target is the square now)
+                const pieceElement = e.target.querySelector('.piece');
+                if (pieceElement) {
+                    // Clone only the piece element for drag image
+                    const dragElement = pieceElement.cloneNode(true);
+                    dragElement.style.position = 'absolute';
+                    dragElement.style.top = '-1000px';
+                    dragElement.style.pointerEvents = 'none';
 
-                // Calculate center offset based on actual piece size
-                const pieceSize = parseFloat(getComputedStyle(e.target).fontSize);
-                const offset = pieceSize / 2;
+                    // Preserve the computed font-size (inherited from square)
+                    const computedStyle = getComputedStyle(pieceElement);
+                    dragElement.style.fontSize = computedStyle.fontSize;
 
-                e.dataTransfer.setDragImage(dragElement, offset, offset);
+                    document.body.appendChild(dragElement);
 
-                setTimeout(() => document.body.removeChild(dragElement), 0);
+                    // Calculate center offset based on actual piece size
+                    const pieceSize = parseFloat(computedStyle.fontSize);
+                    const offset = pieceSize / 2;
+
+                    e.dataTransfer.setDragImage(dragElement, offset, offset);
+
+                    setTimeout(() => document.body.removeChild(dragElement), 0);
+                }
             }
 
             handleDragOver(e, square) {

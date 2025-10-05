@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.1">
+    <meta name="build-number" content="1.0.2">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -657,10 +657,17 @@ Attribution Example:
 
         /* Responsive Design - JavaScript handles sizing, CSS handles edge cases */
 
-        /* Hide banner on small screens to save space */
+        /* Mobile portrait optimizations */
         @media (max-width: 767px) and (orientation: portrait) {
+            /* Show banner ad on mobile */
             .banner-ad {
-                display: none;
+                margin-bottom: 1vmin;
+                min-height: 60px;
+            }
+
+            /* Larger pieces on mobile for better visibility */
+            .square {
+                font-size: 9vmin;
             }
 
             #gameContainer {
@@ -687,7 +694,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.1 | Date: 2025-01-05 | Fix: Mobile centering -->
+    <!-- Build: 1.0.2 | Date: 2025-01-05 | Fix: Mobile banner ad visibility and larger pieces -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>

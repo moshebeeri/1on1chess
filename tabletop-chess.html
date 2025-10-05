@@ -463,6 +463,90 @@
         :-ms-fullscreen .banner-ad {
             display: none;
         }
+
+        /* Responsive Design - Mobile & Tablet Optimizations */
+
+        /* Portrait phones: maximize vertical space */
+        @media (max-width: 767px) and (orientation: portrait) {
+            #gameContainer {
+                gap: 1vmin;
+                padding: 1vmin;
+            }
+
+            #board {
+                width: 75vmin;
+                height: 75vmin;
+            }
+
+            .square {
+                font-size: 9vmin;
+            }
+
+            .timer {
+                font-size: 2.5vmin;
+                padding: 1.5vmin 2.5vmin;
+                min-width: 12vmin;
+            }
+
+            .timers-group {
+                gap: 1.5vmin;
+            }
+
+            /* Hide top banner on portrait phones to save space */
+            .banner-ad {
+                display: none;
+            }
+        }
+
+        /* iPad and tablets in landscape: prevent timer overlap */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+            body {
+                justify-content: center;
+                align-items: center;
+            }
+
+            #gameContainer {
+                gap: 1vmin;
+                padding: 1vmin;
+                justify-content: center;
+            }
+
+            #board {
+                width: 50vmin;
+                height: 50vmin;
+            }
+
+            .square {
+                font-size: 6vmin;
+            }
+
+            .timer {
+                font-size: 2.5vmin;
+                padding: 1.5vmin 2.5vmin;
+                min-width: 12vmin;
+            }
+
+            .timers-group {
+                gap: 1.5vmin;
+            }
+
+            .coord-file,
+            .coord-rank {
+                font-size: 1.5vmin;
+            }
+        }
+
+        /* Tall portrait devices (iPhone Max, etc): use more vertical space */
+        @media (min-aspect-ratio: 1/2) and (max-aspect-ratio: 1/1) and (orientation: portrait) {
+            #board {
+                width: 80vmin;
+                height: 80vmin;
+            }
+
+            .square {
+                font-size: 9.5vmin;
+            }
+        }
     </style>
 </head>
 <body>

@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.3">
+    <meta name="build-number" content="1.0.4">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -243,6 +243,7 @@ Attribution Example:
 
         .piece.white {
             display: inline-block;
+            transform: translateY(-5%);
             color: white !important;
             -webkit-text-fill-color: white !important;
             text-shadow:
@@ -254,7 +255,7 @@ Attribution Example:
 
         .piece.black {
             display: inline-block;
-            transform: rotate(180deg);
+            transform: rotate(180deg) translateY(5%);
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             text-shadow:
@@ -695,7 +696,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.3 | Date: 2025-01-05 | Fix: Vertical centering of pieces in squares -->
+    <!-- Build: 1.0.4 | Date: 2025-01-05 | Fix: Vertical centering using translateY transform -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>

@@ -1271,6 +1271,10 @@
                 this.board.style.width = `${boardSize}px`;
                 this.board.style.height = `${boardSize}px`;
 
+                // Center board on both axes
+                this.gameContainer.style.justifyContent = 'center';
+                this.gameContainer.style.minHeight = '100vh';
+
                 // Calculate piece size (12.5% of board for each square piece)
                 const squareSize = boardSize / 8;
                 const pieceSize = squareSize * 0.85; // 85% of square size

@@ -1,9 +1,43 @@
 <!DOCTYPE html>
+<!--
+================================================================================
+1on1chess.com - Tabletop Chess for Two Players
+================================================================================
+
+Copyright (c) 2025 Moshe Beeri
+Original Repository: https://github.com/moshebeeri/1on1chess
+
+This work is licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+You are free to:
+  - Share: copy and redistribute the material in any medium or format
+  - Adapt: remix, transform, and build upon the material
+
+Under the following terms:
+  - Attribution: You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made. You may do so in any
+    reasonable manner, but not in any way that suggests the licensor
+    endorses you or your use.
+
+  - NonCommercial: You may not use the material for commercial purposes.
+
+  - ShareAlike: If you remix, transform, or build upon the material, you
+    must distribute your contributions under the same license as the original.
+
+Full License: https://creativecommons.org/licenses/by-nc-sa/4.0/
+License Text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+Attribution Example:
+  "Based on 1on1chess.com by Moshe Beeri (https://github.com/moshebeeri/1on1chess)"
+
+================================================================================
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabletop Chess</title>
+    <title>1on1chess.com - Tabletop Chess for Two Players</title>
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2677607454451891"
@@ -493,6 +527,27 @@
             pointer-events: none;
         }
 
+        /* Footer / Copyright */
+        footer {
+            width: 100%;
+            max-width: 970px;
+            margin: 2vmin auto;
+            padding: 1.5vmin;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Hide banner in fullscreen mode */
         #gameContainer.fullscreen-mode ~ .banner-ad,
         :fullscreen .banner-ad,
@@ -624,6 +679,15 @@
             </script>
         </div>
     </div>
+
+    <footer>
+        <div>
+            © 2025 <a href="https://github.com/moshebeeri/1on1chess" target="_blank" rel="noopener">1on1chess.com</a> by Moshe Beeri
+        </div>
+        <div>
+            Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> | Non-Commercial Use Only
+        </div>
+    </footer>
 
     <script>
         // Unicode chess pieces

@@ -13,6 +13,14 @@
           {
             "key": "Cache-Control",
             "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "X-Build-Number",
+            "value": "1.0.0"
+          },
+          {
+            "key": "X-Build-Date",
+            "value": "2025-01-05"
           }
         ]
       },

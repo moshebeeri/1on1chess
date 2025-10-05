@@ -24,7 +24,6 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
         }
 
@@ -35,6 +34,8 @@
             align-items: center;
             gap: 2vmin;
             padding: 2vmin;
+            margin: 0 auto;
+            width: fit-content;
         }
 
         #board {
@@ -215,7 +216,7 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
             z-index: 100;
             overflow-y: auto;
-            transition: transform 0.3s;
+            transition: transform 0.3s, left 0.3s, right 0.3s;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -238,7 +239,7 @@
             z-index: 101;
             border-radius: 0 5px 5px 0;
             font-weight: bold;
-            transition: left 0.3s;
+            transition: left 0.3s, right 0.3s;
         }
 
         #sidebarToggle.collapsed {
@@ -247,8 +248,8 @@
 
         /* Flipped sidebar (switches to right side when board flips) */
         #sidebar.flipped {
-            left: auto;
-            right: 0;
+            left: auto !important;
+            right: 0 !important;
             box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
         }
 
@@ -257,13 +258,13 @@
         }
 
         #sidebarToggle.flipped {
-            left: auto;
+            left: auto !important;
             right: 350px;
             border-radius: 5px 0 0 5px;
         }
 
         #sidebarToggle.flipped.collapsed {
-            left: auto;
+            left: auto !important;
             right: 0;
         }
 
@@ -1160,6 +1161,10 @@
                 this.sidebar = document.getElementById('sidebar');
                 this.sidebarToggle = document.getElementById('sidebarToggle');
 
+                // Track last layout state to prevent infinite loops
+                this.lastLayoutState = null;
+                this.isUpdating = false;
+
                 // Auto-collapse sidebar on mobile devices
                 this.autoCollapseSidebarOnMobile();
 
@@ -1197,9 +1202,6 @@
                 const viewportHeight = window.innerHeight;
                 const isPortrait = viewportHeight > viewportWidth;
 
-                // Auto-collapse sidebar on mobile
-                this.autoCollapseSidebarOnMobile();
-
                 // Hide banner ad on small portrait screens (phones)
                 if (this.banner) {
                     if (isPortrait && viewportWidth < 768) {
@@ -1224,12 +1226,18 @@
             }
 
             updateLayout() {
+                // Prevent re-entry
+                if (this.isUpdating) return;
+
+                this.isUpdating = true;
+
                 // First optimize ad display
                 this.optimizeAdDisplay();
 
                 // Small delay to let ads resize
                 setTimeout(() => {
                     this.calculateAndApplyLayout();
+                    this.isUpdating = false;
                 }, 50);
             }
 
@@ -1240,10 +1248,43 @@
 
                 // Check if sidebar is visible (not collapsed)
                 const sidebarVisible = !this.sidebar.classList.contains('collapsed');
+                const sidebarFlipped = this.sidebar.classList.contains('flipped');
                 const sidebarWidth = sidebarVisible ? 350 : 0;
 
-                // Available width (account for sidebar)
-                const availableWidth = viewportWidth - sidebarWidth;
+                // Create state hash to detect if anything changed
+                const currentState = `${viewportWidth}x${viewportHeight}|${sidebarVisible}|${sidebarFlipped}`;
+
+                // If state hasn't changed, skip update
+                if (this.lastLayoutState === currentState) {
+                    return;
+                }
+
+                this.lastLayoutState = currentState;
+
+                // Toggle button width - only takes space when sidebar is collapsed
+                const toggleButtonWidth = sidebarVisible ? 0 : 60;
+
+                // Set margins on gameContainer to account for toggle button
+                // This ensures the component (board + timers) is centered with space for toggle button
+                if (sidebarVisible) {
+                    // Sidebar open: account for sidebar width
+                    if (sidebarFlipped) {
+                        this.gameContainer.style.marginLeft = '0';
+                        this.gameContainer.style.marginRight = `${sidebarWidth}px`;
+                    } else {
+                        this.gameContainer.style.marginLeft = `${sidebarWidth}px`;
+                        this.gameContainer.style.marginRight = '0';
+                    }
+                } else {
+                    // Sidebar collapsed: account for toggle button
+                    if (sidebarFlipped) {
+                        this.gameContainer.style.marginLeft = '0';
+                        this.gameContainer.style.marginRight = `${toggleButtonWidth}px`;
+                    } else {
+                        this.gameContainer.style.marginLeft = `${toggleButtonWidth}px`;
+                        this.gameContainer.style.marginRight = '0';
+                    }
+                }
 
                 // Measure actual element heights
                 const bannerHeight = this.banner && this.banner.offsetHeight > 0 ? this.banner.offsetHeight : 0;
@@ -1255,7 +1296,9 @@
                 const gap = parseFloat(containerStyle.gap) || 0;
                 const padding = parseFloat(containerStyle.padding) || 0;
 
-                // Calculate available space
+                // Calculate available space (subtract sidebar/toggle button from width)
+                const horizontalSpace = sidebarVisible ? sidebarWidth : toggleButtonWidth;
+                const availableWidth = viewportWidth - horizontalSpace;
                 const availableHeight = viewportHeight - bannerHeight - timersTopHeight - timersBottomHeight - (gap * 3) - (padding * 2);
 
                 // Board should be square, use minimum of width and height
@@ -1270,10 +1313,6 @@
                 const boardSize = Math.floor(maxBoardSize);
                 this.board.style.width = `${boardSize}px`;
                 this.board.style.height = `${boardSize}px`;
-
-                // Center board on both axes
-                this.gameContainer.style.justifyContent = 'center';
-                this.gameContainer.style.minHeight = '100vh';
 
                 // Calculate piece size (12.5% of board for each square piece)
                 const squareSize = boardSize / 8;
@@ -1299,13 +1338,13 @@
                     timer.style.padding = `${timerFontSize * 0.4}px ${timerFontSize * 0.8}px`;
                 });
 
-                // Log layout info for debugging
-                console.log('Layout updated:', {
-                    viewport: `${viewportWidth}x${viewportHeight}`,
-                    availableSpace: `${availableWidth}x${availableHeight}`,
-                    boardSize: `${boardSize}px`,
-                    bannerHeight: `${bannerHeight}px`
-                });
+                // Log layout info for debugging (commented out to prevent console spam)
+                // console.log('Layout updated:', {
+                //     viewport: `${viewportWidth}x${viewportHeight}`,
+                //     availableSpace: `${availableWidth}x${availableHeight}`,
+                //     boardSize: `${boardSize}px`,
+                //     bannerHeight: `${bannerHeight}px`
+                // });
             }
         }
 

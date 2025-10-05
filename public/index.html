@@ -852,8 +852,9 @@
                             let rotationClass = '';
 
                             if (this.rotationMode === 'fixed') {
-                                // Fixed mode: apply color class (black pieces get rotated via .piece.black CSS)
-                                colorClass = piece.color === 'b' ? ' black' : ' white';
+                                // Fixed mode: when flipped, swap which pieces are rotated (simulates table rotation)
+                                const shouldRotate = this.flipped ? (piece.color === 'w') : (piece.color === 'b');
+                                colorClass = shouldRotate ? ' black' : ' white';
                             } else if (this.rotationMode === 'turn-based') {
                                 // Turn-based mode: only apply white class for styling, rotate all pieces on black's turn
                                 colorClass = piece.color === 'w' ? ' white' : '';

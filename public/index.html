@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.4">
+    <meta name="build-number" content="1.0.5">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -242,8 +242,7 @@ Attribution Example:
         }
 
         .piece.white {
-            display: inline-block;
-            transform: translateY(-5%);
+            transform: translateY(-15%);
             color: white !important;
             -webkit-text-fill-color: white !important;
             text-shadow:
@@ -254,8 +253,7 @@ Attribution Example:
         }
 
         .piece.black {
-            display: inline-block;
-            transform: rotate(180deg) translateY(5%);
+            transform: rotate(180deg) translateY(-15%);
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             text-shadow:
@@ -696,7 +694,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.4 | Date: 2025-01-05 | Fix: Vertical centering using translateY transform -->
+    <!-- Build: 1.0.5 | Date: 2025-01-05 | Fix: Mobile board centering and piece vertical alignment -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
@@ -1488,6 +1486,7 @@ Attribution Example:
 
                 // On mobile (< 768px), don't apply margins - let CSS auto-centering handle it
                 const isMobile = viewportWidth < 768;
+                const toggleButtonWidth = sidebarVisible ? 0 : 60;
 
                 if (isMobile) {
                     // Mobile: reset margins to allow CSS auto-centering
@@ -1495,8 +1494,6 @@ Attribution Example:
                     this.gameContainer.style.marginRight = '';
                 } else {
                     // Desktop/Tablet: account for sidebar/toggle button
-                    const toggleButtonWidth = sidebarVisible ? 0 : 60;
-
                     if (sidebarVisible) {
                         // Sidebar open: account for sidebar width
                         if (sidebarFlipped) {
@@ -1528,15 +1525,17 @@ Attribution Example:
                 const gap = parseFloat(containerStyle.gap) || 0;
                 const padding = parseFloat(containerStyle.padding) || 0;
 
-                // Calculate available space (subtract sidebar/toggle button from width)
-                const horizontalSpace = sidebarVisible ? sidebarWidth : toggleButtonWidth;
+                // Calculate available space
+                // On mobile, use full viewport width; on desktop, subtract sidebar/toggle button
+                const horizontalSpace = isMobile ? 0 : (sidebarVisible ? sidebarWidth : toggleButtonWidth);
                 const availableWidth = viewportWidth - horizontalSpace;
                 const availableHeight = viewportHeight - bannerHeight - timersTopHeight - timersBottomHeight - (gap * 3) - (padding * 2);
 
                 // Board should be square, use minimum of width and height
-                // Leave some margin (90% of available space)
+                // Use more width on mobile (98%) vs desktop (92%)
+                const widthPercentage = isMobile ? 0.98 : 0.92;
                 const maxBoardSize = Math.min(
-                    availableWidth * 0.92,
+                    availableWidth * widthPercentage,
                     availableHeight * 0.95,
                     800 // Max size cap for very large screens
                 );

@@ -24,7 +24,9 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
         }
 
         #gameContainer {
@@ -449,12 +451,46 @@
             max-width: 970px;
             margin: 0 auto 2vmin auto;
             padding: 1vmin;
-            background: rgba(44, 62, 80, 0.5);
+            background: rgba(52, 152, 219, 0.2);
+            border: 2px dashed rgba(52, 152, 219, 0.5);
             border-radius: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 90px;
+        }
+
+        .banner-ad::before {
+            content: "Advertisement";
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Sidebar Ad Container */
+        .sidebar-ad-container {
+            width: 100%;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border: 2px dashed rgba(52, 152, 219, 0.5);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 250px;
+            max-height: 600px;
+            transform: none !important;
+            position: relative;
+        }
+
+        .sidebar-ad-container::before {
+            content: "Advertisement";
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            position: absolute;
+            pointer-events: none;
         }
 
         /* Hide banner in fullscreen mode */
@@ -502,6 +538,7 @@
 
     <!-- Top Banner Ad -->
     <div class="banner-ad">
+        <!-- 1on1chess - Top Banner -->
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-2677607454451891"
@@ -572,6 +609,20 @@
 
         <h3>Move History (PGN)</h3>
         <div id="moveList">No moves yet</div>
+
+        <!-- Sidebar Ad -->
+        <div class="sidebar-ad-container">
+            <!-- Display ad for the sidebar -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-2677607454451891"
+                 data-ad-slot="8945852305"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
     </div>
 
     <script>
@@ -1208,19 +1259,6 @@
                         this.banner.style.display = 'none';
                     } else {
                         this.banner.style.display = 'flex';
-                    }
-                }
-
-                // Determine optimal ad container height for sidebar ad
-                const sidebarAdContainer = document.querySelector('.ad-container');
-                if (sidebarAdContainer) {
-                    // Responsive ad sizing based on available sidebar space
-                    if (viewportHeight < 700) {
-                        sidebarAdContainer.style.minHeight = '50px'; // Smaller ad
-                    } else if (viewportHeight < 900) {
-                        sidebarAdContainer.style.minHeight = '90px'; // Standard banner
-                    } else {
-                        sidebarAdContainer.style.minHeight = '120px'; // Larger ad
                     }
                 }
             }

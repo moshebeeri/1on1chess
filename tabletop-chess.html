@@ -44,7 +44,7 @@ Attribution Example:
     <meta http-equiv="Expires" content="0">
 
     <!-- Build Version -->
-    <meta name="build-number" content="1.0.5">
+    <meta name="build-number" content="1.0.6">
     <meta name="build-date" content="2025-01-05">
 
     <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
@@ -694,7 +694,7 @@ Attribution Example:
     </style>
 </head>
 <body>
-    <!-- Build: 1.0.5 | Date: 2025-01-05 | Fix: Mobile board centering and piece vertical alignment -->
+    <!-- Build: 1.0.6 | Date: 2025-01-05 | Fix: Drag-and-drop piece size and cursor alignment -->
     <!-- SEO Content - Hidden but indexed by search engines -->
     <div class="seo-content">
         <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
@@ -1268,17 +1268,17 @@ Attribution Example:
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', position);
 
-                // Create a better drag image for white pieces visibility
+                // Clone the piece element for drag image without extra styling
                 const dragElement = e.target.cloneNode(true);
                 dragElement.style.position = 'absolute';
                 dragElement.style.top = '-1000px';
-                dragElement.style.fontSize = '7vmin';
-                dragElement.style.padding = '10px';
-                dragElement.style.background = 'rgba(0, 0, 0, 0.1)';
-                dragElement.style.borderRadius = '5px';
                 document.body.appendChild(dragElement);
 
-                e.dataTransfer.setDragImage(dragElement, 25, 25);
+                // Calculate center offset based on actual piece size
+                const pieceSize = parseFloat(getComputedStyle(e.target).fontSize);
+                const offset = pieceSize / 2;
+
+                e.dataTransfer.setDragImage(dragElement, offset, offset);
 
                 setTimeout(() => document.body.removeChild(dragElement), 0);
             }

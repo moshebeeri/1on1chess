@@ -1,16 +1,118 @@
 <!DOCTYPE html>
+<!--
+================================================================================
+1on1chess.com - Tabletop Chess for Two Players
+================================================================================
+
+Copyright (c) 2025 Moshe Beeri
+Original Repository: https://github.com/moshebeeri/1on1chess
+
+This work is licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+You are free to:
+  - Share: copy and redistribute the material in any medium or format
+  - Adapt: remix, transform, and build upon the material
+
+Under the following terms:
+  - Attribution: You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made. You may do so in any
+    reasonable manner, but not in any way that suggests the licensor
+    endorses you or your use.
+
+  - NonCommercial: You may not use the material for commercial purposes.
+
+  - ShareAlike: If you remix, transform, or build upon the material, you
+    must distribute your contributions under the same license as the original.
+
+Full License: https://creativecommons.org/licenses/by-nc-sa/4.0/
+License Text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+Attribution Example:
+  "Based on 1on1chess.com by Moshe Beeri (https://github.com/moshebeeri/1on1chess)"
+
+================================================================================
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1on1chess.com - Tabletop Chess for Two Players</title>
-    <meta name="description" content="Play chess face-to-face on tablets and iPads. Two players, one device. Features dual timers, move validation, and fullscreen mode for optimal tabletop play.">
+
+    <!-- Cache Control - Force fresh load -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Build Version -->
+    <meta name="build-number" content="1.0.0">
+    <meta name="build-date" content="2025-01-05">
+
+    <title>1on1chess.com - Free Tabletop Chess for Tablets & Mobile | Offline Chess Clock</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free tabletop chess game for tablets and mobile phones. Perfect for travelers! Works offline, saves game state, includes chess clock. Replace your chess board with your iPad or tablet. Best offline chess solution.">
+    <meta name="keywords" content="tabletop chess, chess for tablets, chess for iPad, mobile chess, offline chess, chess clock, travel chess, chess timer, two player chess, chess board replacement, tablet chess game, chess for travelers">
+    <meta name="author" content="Moshe Beeri">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2c3e50">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://1on1chess.com/">
+    <meta property="og:title" content="1on1chess.com - Free Tabletop Chess for Tablets & Mobile">
+    <meta property="og:description" content="Perfect chess solution for travelers! Works offline, includes chess clock, saves game state. Replace your chess board with your tablet or phone.">
+    <meta property="og:site_name" content="1on1chess.com">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://1on1chess.com/">
+    <meta name="twitter:title" content="1on1chess.com - Free Tabletop Chess for Tablets & Mobile">
+    <meta name="twitter:description" content="Perfect chess solution for travelers! Works offline, includes chess clock, saves game state. Replace your chess board with your tablet.">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "1on1chess.com",
+      "applicationCategory": "Game",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free tabletop chess game for tablets and mobile phones. Perfect for travelers! Works offline, saves game state, includes built-in chess clock. Replace your chess board with your iPad or tablet.",
+      "browserRequirements": "Requires JavaScript",
+      "url": "https://1on1chess.com",
+      "author": {
+        "@type": "Person",
+        "name": "Moshe Beeri"
+      },
+      "featureList": [
+        "Offline gameplay",
+        "Game state persistence",
+        "Built-in chess clock",
+        "Multiple time controls",
+        "Move history tracking",
+        "Works on tablets and mobile phones",
+        "No installation required",
+        "Perfect for travel"
+      ]
+    }
+    </script>
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2677607454451891"
             crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <!-- Google Fonts for chess symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -25,8 +127,9 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
         }
 
         #gameContainer {
@@ -36,6 +139,8 @@
             align-items: center;
             gap: 2vmin;
             padding: 2vmin;
+            margin: 0 auto;
+            width: fit-content;
         }
 
         #board {
@@ -121,6 +226,10 @@
         .piece {
             pointer-events: auto;
             cursor: grab;
+            font-family: "DejaVu Sans", "Noto Sans Symbols", "Segoe UI Symbol", "Arial Unicode MS", sans-serif;
+            font-variant-emoji: text;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .piece:active {
@@ -132,13 +241,25 @@
         }
 
         .piece.white {
-            color: white;
-            text-shadow: 0 0 2px black, 0 0 2px black, 0 0 2px black;
+            display: inline-block;
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+            text-shadow:
+                0 0 2px rgba(0, 0, 0, 0.9),
+                0 0 2px rgba(0, 0, 0, 0.9),
+                1px 1px 1px rgba(0, 0, 0, 0.7),
+                -1px -1px 1px rgba(0, 0, 0, 0.7);
         }
 
         .piece.black {
             display: inline-block;
             transform: rotate(180deg);
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow:
+                0 0 1px rgba(255, 255, 255, 0.5),
+                0 0 1px rgba(255, 255, 255, 0.5),
+                1px 1px 1px rgba(255, 255, 255, 0.3);
         }
 
         .piece.in-check {
@@ -216,10 +337,10 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
             z-index: 100;
             overflow-y: auto;
-            transition: transform 0.3s;
+            transition: transform 0.3s, left 0.3s, right 0.3s;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         #sidebar.collapsed {
@@ -239,7 +360,7 @@
             z-index: 101;
             border-radius: 0 5px 5px 0;
             font-weight: bold;
-            transition: left 0.3s;
+            transition: left 0.3s, right 0.3s;
         }
 
         #sidebarToggle.collapsed {
@@ -248,8 +369,8 @@
 
         /* Flipped sidebar (switches to right side when board flips) */
         #sidebar.flipped {
-            left: auto;
-            right: 0;
+            left: auto !important;
+            right: 0 !important;
             box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
         }
 
@@ -258,30 +379,30 @@
         }
 
         #sidebarToggle.flipped {
-            left: auto;
+            left: auto !important;
             right: 350px;
             border-radius: 5px 0 0 5px;
         }
 
         #sidebarToggle.flipped.collapsed {
-            left: auto;
+            left: auto !important;
             right: 0;
         }
 
         .controls-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .controls-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         button {
-            padding: 12px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13px;
             background: #3498db;
             color: white;
             border: none;
@@ -321,29 +442,14 @@
 
         h3 {
             margin: 0;
-            font-size: 18px;
+            font-size: 16px;
             color: #3498db;
-        }
-
-        .ad-container {
-            margin-top: 20px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ad-container ins {
-            width: 100%;
         }
 
         select {
             width: 100%;
-            padding: 12px;
-            font-size: 14px;
+            padding: 10px;
+            font-size: 13px;
             background: rgba(0, 0, 0, 0.3);
             color: white;
             border: 2px solid #3498db;
@@ -464,12 +570,80 @@
             max-width: 970px;
             margin: 0 auto 2vmin auto;
             padding: 1vmin;
-            background: rgba(44, 62, 80, 0.5);
+            background: rgba(52, 152, 219, 0.2);
+            border: 2px dashed rgba(52, 152, 219, 0.5);
             border-radius: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 90px;
+        }
+
+        .banner-ad::before {
+            content: "Advertisement";
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Sidebar Ad Container */
+        .sidebar-ad-container {
+            width: 100%;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border: 2px dashed rgba(52, 152, 219, 0.5);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 250px;
+            max-height: 600px;
+            transform: none !important;
+            position: relative;
+        }
+
+        .sidebar-ad-container::before {
+            content: "Advertisement";
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Footer / Copyright */
+        footer {
+            width: 100%;
+            max-width: 970px;
+            margin: 2vmin auto;
+            padding: 1.5vmin;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* SEO Content - Visually hidden but accessible to screen readers and search engines */
+        .seo-content {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
 
         /* Hide banner in fullscreen mode */
@@ -513,10 +687,31 @@
     </style>
 </head>
 <body>
+    <!-- Build: 1.0.0 | Date: 2025-01-05 | Font: DejaVu Sans, Noto Sans Symbols -->
+    <!-- SEO Content - Hidden but indexed by search engines -->
+    <div class="seo-content">
+        <h1>Free Tabletop Chess Game for Tablets and Mobile Phones</h1>
+        <h2>The Best Chess Solution for Travelers - Works Offline!</h2>
+        <p>1on1chess.com is the perfect digital chess board replacement for your iPad, tablet, or mobile phone. Designed specifically for tabletop play, this free chess application is ideal for travelers and anyone who wants to play chess without carrying a physical board.</p>
+        <h3>Key Features:</h3>
+        <ul>
+            <li>Works completely offline - no internet connection required</li>
+            <li>Built-in chess clock with multiple time controls (Bullet, Blitz, Rapid, Classical)</li>
+            <li>Automatic game state saving - never lose your game</li>
+            <li>Perfect for tablets and mobile devices (iPad, iPhone, Android)</li>
+            <li>Designed for tabletop play - both players can see the board</li>
+            <li>Move history and PGN notation tracking</li>
+            <li>No installation required - works in your browser</li>
+            <li>Free and open source</li>
+        </ul>
+        <p>Replace your chess board with your tablet. Perfect for travel, coffee shops, parks, or anywhere you want to play chess. The best offline chess clock and board combination for mobile devices.</p>
+    </div>
+
     <button id="fullscreenExit">×</button>
 
     <!-- Top Banner Ad -->
     <div class="banner-ad">
+        <!-- 1on1chess - Top Banner -->
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-2677607454451891"
@@ -588,8 +783,9 @@
         <h3>Move History (PGN)</h3>
         <div id="moveList">No moves yet</div>
 
-        <!-- AdSense Ad Unit -->
-        <div class="ad-container">
+        <!-- Sidebar Ad -->
+        <div class="sidebar-ad-container">
+            <!-- Display ad for the sidebar -->
             <ins class="adsbygoogle"
                  style="display:block"
                  data-ad-client="ca-pub-2677607454451891"
@@ -600,18 +796,18 @@
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
-        <!-- Privacy Policy Link -->
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
-            <a href="/privacy.html" style="color: #3498db; text-decoration: none; font-size: 12px;">Privacy Policy</a>
-        </div>
     </div>
+
+    <footer>
+        © 2025 <a href="https://github.com/moshebeeri/1on1chess" target="_blank" rel="noopener">1on1chess.com</a> by Moshe Beeri | <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> | Non-Commercial Use Only
+    </footer>
 
     <script>
         // Unicode chess pieces
+        // Use outlined (white) Unicode chars for both colors, CSS handles styling
         const PIECES = {
             'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+            'k': '♔', 'q': '♕', 'r': '♖', 'b': '♗', 'n': '♘', 'p': '♙'
         };
 
         // Storage Manager
@@ -1194,6 +1390,10 @@
                 this.sidebar = document.getElementById('sidebar');
                 this.sidebarToggle = document.getElementById('sidebarToggle');
 
+                // Track last layout state to prevent infinite loops
+                this.lastLayoutState = null;
+                this.isUpdating = false;
+
                 // Auto-collapse sidebar on mobile devices
                 this.autoCollapseSidebarOnMobile();
 
@@ -1231,9 +1431,6 @@
                 const viewportHeight = window.innerHeight;
                 const isPortrait = viewportHeight > viewportWidth;
 
-                // Auto-collapse sidebar on mobile
-                this.autoCollapseSidebarOnMobile();
-
                 // Hide banner ad on small portrait screens (phones)
                 if (this.banner) {
                     if (isPortrait && viewportWidth < 768) {
@@ -1242,28 +1439,21 @@
                         this.banner.style.display = 'flex';
                     }
                 }
-
-                // Determine optimal ad container height for sidebar ad
-                const sidebarAdContainer = document.querySelector('.ad-container');
-                if (sidebarAdContainer) {
-                    // Responsive ad sizing based on available sidebar space
-                    if (viewportHeight < 700) {
-                        sidebarAdContainer.style.minHeight = '50px'; // Smaller ad
-                    } else if (viewportHeight < 900) {
-                        sidebarAdContainer.style.minHeight = '90px'; // Standard banner
-                    } else {
-                        sidebarAdContainer.style.minHeight = '120px'; // Larger ad
-                    }
-                }
             }
 
             updateLayout() {
+                // Prevent re-entry
+                if (this.isUpdating) return;
+
+                this.isUpdating = true;
+
                 // First optimize ad display
                 this.optimizeAdDisplay();
 
                 // Small delay to let ads resize
                 setTimeout(() => {
                     this.calculateAndApplyLayout();
+                    this.isUpdating = false;
                 }, 50);
             }
 
@@ -1274,10 +1464,43 @@
 
                 // Check if sidebar is visible (not collapsed)
                 const sidebarVisible = !this.sidebar.classList.contains('collapsed');
+                const sidebarFlipped = this.sidebar.classList.contains('flipped');
                 const sidebarWidth = sidebarVisible ? 350 : 0;
 
-                // Available width (account for sidebar)
-                const availableWidth = viewportWidth - sidebarWidth;
+                // Create state hash to detect if anything changed
+                const currentState = `${viewportWidth}x${viewportHeight}|${sidebarVisible}|${sidebarFlipped}`;
+
+                // If state hasn't changed, skip update
+                if (this.lastLayoutState === currentState) {
+                    return;
+                }
+
+                this.lastLayoutState = currentState;
+
+                // Toggle button width - only takes space when sidebar is collapsed
+                const toggleButtonWidth = sidebarVisible ? 0 : 60;
+
+                // Set margins on gameContainer to account for toggle button
+                // This ensures the component (board + timers) is centered with space for toggle button
+                if (sidebarVisible) {
+                    // Sidebar open: account for sidebar width
+                    if (sidebarFlipped) {
+                        this.gameContainer.style.marginLeft = '0';
+                        this.gameContainer.style.marginRight = `${sidebarWidth}px`;
+                    } else {
+                        this.gameContainer.style.marginLeft = `${sidebarWidth}px`;
+                        this.gameContainer.style.marginRight = '0';
+                    }
+                } else {
+                    // Sidebar collapsed: account for toggle button
+                    if (sidebarFlipped) {
+                        this.gameContainer.style.marginLeft = '0';
+                        this.gameContainer.style.marginRight = `${toggleButtonWidth}px`;
+                    } else {
+                        this.gameContainer.style.marginLeft = `${toggleButtonWidth}px`;
+                        this.gameContainer.style.marginRight = '0';
+                    }
+                }
 
                 // Measure actual element heights
                 const bannerHeight = this.banner && this.banner.offsetHeight > 0 ? this.banner.offsetHeight : 0;
@@ -1289,7 +1512,9 @@
                 const gap = parseFloat(containerStyle.gap) || 0;
                 const padding = parseFloat(containerStyle.padding) || 0;
 
-                // Calculate available space
+                // Calculate available space (subtract sidebar/toggle button from width)
+                const horizontalSpace = sidebarVisible ? sidebarWidth : toggleButtonWidth;
+                const availableWidth = viewportWidth - horizontalSpace;
                 const availableHeight = viewportHeight - bannerHeight - timersTopHeight - timersBottomHeight - (gap * 3) - (padding * 2);
 
                 // Board should be square, use minimum of width and height
@@ -1304,10 +1529,6 @@
                 const boardSize = Math.floor(maxBoardSize);
                 this.board.style.width = `${boardSize}px`;
                 this.board.style.height = `${boardSize}px`;
-
-                // Center board on both axes
-                this.gameContainer.style.justifyContent = 'center';
-                this.gameContainer.style.minHeight = '100vh';
 
                 // Calculate piece size (12.5% of board for each square piece)
                 const squareSize = boardSize / 8;
@@ -1333,13 +1554,13 @@
                     timer.style.padding = `${timerFontSize * 0.4}px ${timerFontSize * 0.8}px`;
                 });
 
-                // Log layout info for debugging
-                console.log('Layout updated:', {
-                    viewport: `${viewportWidth}x${viewportHeight}`,
-                    availableSpace: `${availableWidth}x${availableHeight}`,
-                    boardSize: `${boardSize}px`,
-                    bannerHeight: `${bannerHeight}px`
-                });
+                // Log layout info for debugging (commented out to prevent console spam)
+                // console.log('Layout updated:', {
+                //     viewport: `${viewportWidth}x${viewportHeight}`,
+                //     availableSpace: `${availableWidth}x${availableHeight}`,
+                //     boardSize: `${boardSize}px`,
+                //     bannerHeight: `${bannerHeight}px`
+                // });
             }
         }
 
